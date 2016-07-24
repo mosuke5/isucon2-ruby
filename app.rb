@@ -15,7 +15,7 @@ class Isucon2App < Sinatra::Base
         :username => config['username'],
         :password => config['password'],
         :database => config['dbname'],
-        :reconnect => false,
+        :reconnect => true,
       )
   end
 
@@ -91,16 +91,16 @@ class Isucon2App < Sinatra::Base
 
   post '/buy' do
     $mysql.query('BEGIN')
-    $mysql.query("INSERT INTO order_request (member_id) VALUES ('#{ $mysql.escape(params[:member_id]) }')")
-    order_id = $mysql.last_id
+    #$mysql.query("INSERT INTO order_request (member_id) VALUES ('#{ $mysql.escape(params[:member_id]) }')")
+    #order_id = $mysql.last_id
     $mysql.query(
-      "UPDATE stock SET order_id = #{ $mysql.escape(order_id.to_s) }
-       WHERE variation_id = #{ $mysql.escape(params[:variation_id]) } AND order_id IS NULL
+      "UPDATE stock SET member_id = #{ $mysql.escape(params[:member_id].to_s) }
+       WHERE variation_id = #{ $mysql.escape(params[:variation_id]) } AND member_id IS NULL
        ORDER BY RAND() LIMIT 1",
     )
     if $mysql.affected_rows > 0
       seat_id = $mysql.query(
-        "SELECT seat_id FROM stock WHERE order_id = #{ $mysql.escape(order_id.to_s) } LIMIT 1",
+        "SELECT seat_id FROM stock WHERE member_id = #{ $mysql.escape(params[:member_id].to_s) } LIMIT 1",
       ).first['seat_id']
       $mysql.query('COMMIT')
       slim :complete, :locals => { :seat_id => seat_id, :member_id => params[:member_id] }
@@ -119,9 +119,7 @@ class Isucon2App < Sinatra::Base
   get '/admin/order.csv' do
     body  = ''
     orders = $mysql.query(
-      'SELECT order_request.*, stock.seat_id, stock.variation_id, stock.updated_at
-       FROM order_request JOIN stock ON order_request.id = stock.order_id
-       ORDER BY order_request.id ASC',
+      'SELECT stock.member_id, stock.seat_id, stock.variation_id, stock.updated_at FROM stock'
     )
     orders.each do |order|
       order['updated_at'] = order['updated_at'].strftime('%Y-%m-%d %X')
