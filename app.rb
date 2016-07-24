@@ -103,7 +103,7 @@ class Isucon2App < Sinatra::Base
     )
     if $mysql.affected_rows > 0
       seat_id = $mysql.query(
-        "SELECT seat_id FROM stock WHERE member_id = #{ $mysql.escape(params[:member_id].to_s) } LIMIT 1",
+        "SELECT seat_id FROM stock WHERE member_id = '#{ $mysql.escape(params[:member_id].to_s) }' LIMIT 1",
       ).first['seat_id']
       $mysql.query('COMMIT')
       slim :complete, :locals => { :seat_id => seat_id, :member_id => params[:member_id] }
