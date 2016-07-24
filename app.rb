@@ -93,6 +93,9 @@ class Isucon2App < Sinatra::Base
     $mysql.query('BEGIN')
     #$mysql.query("INSERT INTO order_request (member_id) VALUES ('#{ $mysql.escape(params[:member_id]) }')")
     #order_id = $mysql.last_id
+    puts ("UPDATE stock SET member_id = #{ $mysql.escape(params[:member_id].to_s) }
+       WHERE variation_id = #{ $mysql.escape(params[:variation_id]) } AND member_id IS NULL
+       ORDER BY RAND() LIMIT 1")
     $mysql.query(
       "UPDATE stock SET member_id = #{ $mysql.escape(params[:member_id].to_s) }
        WHERE variation_id = #{ $mysql.escape(params[:variation_id]) } AND member_id IS NULL
