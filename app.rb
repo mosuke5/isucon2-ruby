@@ -26,8 +26,8 @@ class Isucon2App < Sinatra::Base
            JOIN variation ON stock.variation_id = variation.id
            JOIN ticket ON variation.ticket_id = ticket.id
            JOIN artist ON ticket.artist_id = artist.id
-         WHERE order_id IS NOT NULL
-         ORDER BY order_id DESC LIMIT 10',
+         WHERE member_id IS NOT NULL
+         ORDER BY member_id DESC LIMIT 10',
       )
     end
   end
@@ -52,7 +52,7 @@ class Isucon2App < Sinatra::Base
       ticket["count"] = $mysql.query(
         "SELECT COUNT(*) AS cnt FROM variation
          INNER JOIN stock ON stock.variation_id = variation.id
-         WHERE variation.ticket_id = #{ $mysql.escape(ticket['id'].to_s) } AND stock.order_id IS NULL",
+         WHERE variation.ticket_id = #{ $mysql.escape(ticket['id'].to_s) } AND stock.member_id IS NULL",
       ).first["cnt"]
     end
     slim :artist, :locals => {
@@ -73,7 +73,7 @@ class Isucon2App < Sinatra::Base
     variations.each do |variation|
       variation["count"] = $mysql.query(
         "SELECT COUNT(*) AS cnt FROM stock
-         WHERE variation_id = #{ $mysql.escape(variation['id'].to_s) } AND order_id IS NULL",
+         WHERE variation_id = #{ $mysql.escape(variation['id'].to_s) } AND member_id IS NULL",
       ).first["cnt"]
       variation["stock"] = {}
       $mysql.query(
