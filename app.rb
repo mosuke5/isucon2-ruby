@@ -15,7 +15,7 @@ class Isucon2App < Sinatra::Base
         :username => config['username'],
         :password => config['password'],
         :database => config['dbname'],
-        :reconnect => true,
+        :reconnect => false,
       )
   end
 
