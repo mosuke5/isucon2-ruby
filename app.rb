@@ -77,10 +77,10 @@ class Isucon2App < Sinatra::Base
       ).first["cnt"]
       variation["stock"] = {}
       $mysql.query(
-        "SELECT seat_id, order_id FROM stock
+        "SELECT seat_id, member_id FROM stock
          WHERE variation_id = #{ $mysql.escape(variation['id'].to_s) }",
       ).each do |stock|
-        variation["stock"][stock["seat_id"]] = stock["order_id"]
+        variation["stock"][stock["seat_id"]] = stock["member_id"]
       end
     end
     slim :ticket, :locals => {
